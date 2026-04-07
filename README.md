@@ -1,35 +1,35 @@
-# SetForge — AI DJ Set Planner
+# SetForge v2 — AI DJ Set Planner
 
-## Deploy to Vercel (Step by Step)
+## What changed in v2
+- Genre deselect bug fixed
+- Larger text throughout
+- BPM shown per track
+- Better mobile layout (track list stacks cleanly)
+- Wider desktop layout (uses full screen width)
+- Artist and title in separate columns for quick scanning
+- Upsell updated with live BPM filter feature mention
 
-### 1. Upload to GitHub
-- Go to github.com and log in
-- Click the "+" icon → "New repository"
-- Name it "setforge", keep it Public, click "Create repository"
-- Click "uploading an existing file"
-- Drag and drop ALL files from this folder into the upload area
+## Deploy to Vercel
+
+### Upload to GitHub
+- Go to your existing "setforge" repo on github.com
+- Click "Add file" → "Upload files"
+- Delete old files and upload all files from this folder
 - Click "Commit changes"
+- Vercel will auto-redeploy within 30 seconds
 
-### 2. Deploy on Vercel
-- Go to vercel.com and log in with GitHub
-- Click "Add New Project"
-- Find "setforge" in your repository list and click "Import"
-- Before clicking Deploy, click "Environment Variables"
-- Add a new variable:
-  - Name: ANTHROPIC_API_KEY
-  - Value: (paste your Anthropic API key here)
-- Click "Deploy"
-
-### 3. You're live!
-Vercel will give you a URL like: setforge.vercel.app
-Open it on your phone — it's fully working.
+### First time setup
+- Go to vercel.com → "Add New Project"
+- Import your "setforge" GitHub repo
+- Add environment variable: ANTHROPIC_API_KEY = your key
+- Click Deploy
 
 ## Local Development
-```
+Create a .env.local file:
+ANTHROPIC_API_KEY=your_key_here
+
+Then run:
 npm install
 npm run dev
-```
-Then open http://localhost:3000
 
-You'll need a .env.local file with:
-ANTHROPIC_API_KEY=your_key_here
+Open http://localhost:3000

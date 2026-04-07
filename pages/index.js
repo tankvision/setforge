@@ -17,10 +17,11 @@ export default function Home() {
     mustPlay: '', avoid: '', level: 'pro'
   });
 
-  const toggleGenre = (g) => setForm(f => ({
-    ...f,
-    genres: f.genres.includes(g) ? f.genres.filter(x => x !== g) : [...f.genres, g]
-  }));
+  const setField = (key, val) => setForm(f => ({ ...f, [key]: val }));
+
+  const toggleEvent = (val) => setField('event', form.event === val ? '' : val);
+  const toggleVibe = (val) => setField('vibe', form.vibe === val ? '' : val);
+  const toggleGenre = (g) => setField('genres', form.genres.includes(g) ? form.genres.filter(x => x !== g) : [...form.genres, g]);
 
   const generate = async () => {
     setLoading(true);
@@ -42,29 +43,31 @@ export default function Home() {
   };
 
   const reset = () => {
-    setStep(1); setResult(null);
-    setForm({ event:'', vibe:'', duration:'60', crowdAge:'25–35', genres:[], bpmStart:'95', bpmPeak:'128', mustPlay:'', avoid:'', level:'pro' });
+    setStep(1);
+    setResult(null);
+    setForm({ event: '', vibe: '', duration: '60', crowdAge: '25–35', genres: [], bpmStart: '95', bpmPeak: '128', mustPlay: '', avoid: '', level: 'pro' });
   };
 
   const copyPlan = () => {
     if (!result) return;
-    let text = `SETFORGE — ${form.event} | ${form.duration} min | ${form.vibe}\nBPM: ${form.bpmStart}–${form.bpmPeak} | Genres: ${form.genres.join(', ')}\n\n`;
+    let text = `SETFORGE — ${form.event} | ${form.duration} min | ${form.vibe}\n`;
+    text += `BPM: ${form.bpmStart}–${form.bpmPeak} | Genres: ${form.genres.join(', ')}\n\n`;
     text += `OVERVIEW\n${result.overview}\n\nPHASES\n`;
     result.phases?.forEach(p => {
       text += `\n${p.name} | ${p.time} | ${p.bpm} BPM | Energy ${p.energy}/9\n`;
-      p.tracks?.forEach((t, i) => text += `  ${i+1}. ${t}\n`);
+      p.tracks?.forEach((t, i) => text += `  ${i + 1}. ${t.artist} – ${t.title} (${t.bpm} BPM)\n`);
       if (p.notes) text += `  Note: ${p.notes}\n`;
     });
     text += `\nTRANSITIONS\n`;
     result.transitions?.forEach(t => text += `  > ${t.moment}\n    Technique: ${t.technique}\n`);
     text += `\nEMERGENCY TRACKS\n`;
-    result.emergency?.forEach(e => text += `  > ${e}\n`);
+    result.emergency?.forEach(e => text += `  > ${e.artist} – ${e.title} (${e.bpm} BPM)\n`);
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const energyDots = (n) => Array.from({length: 9}, (_, i) => (
+  const energyDots = (n) => Array.from({ length: 9 }, (_, i) => (
     <span key={i} className={`${styles.dot} ${i < n ? styles.dotOn : ''}`} />
   ));
 
@@ -76,7 +79,7 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
-        <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
       </Head>
 
       <div className={styles.app}>
@@ -91,7 +94,7 @@ export default function Home() {
             </div>
           </div>
 
-          {/* STEP 1 */}
+          {/* STEP 1 — Event */}
           {step === 1 && (
             <div>
               <h1 className={styles.title}>Build your set</h1>
@@ -101,7 +104,7 @@ export default function Home() {
                 <div className={styles.label}>Event type</div>
                 <div className={styles.chipGrid}>
                   {EVENT_TYPES.map(e => (
-                    <button key={e} className={`${styles.chip} ${form.event === e ? styles.chipOn : ''}`} onClick={() => setForm(f => ({...f, event: e}))}>
+                    <button key={e} className={`${styles.chip} ${form.event === e ? styles.chipOn : ''}`} onClick={() => toggleEvent(e)}>
                       {e}
                     </button>
                   ))}
@@ -112,7 +115,7 @@ export default function Home() {
                 <div className={styles.label}>Vibe</div>
                 <div className={styles.chipGrid}>
                   {VIBES.map(v => (
-                    <button key={v} className={`${styles.chip} ${form.vibe === v ? styles.chipOn : ''}`} onClick={() => setForm(f => ({...f, vibe: v}))}>
+                    <button key={v} className={`${styles.chip} ${form.vibe === v ? styles.chipOn : ''}`} onClick={() => toggleVibe(v)}>
                       {v}
                     </button>
                   ))}
@@ -122,11 +125,11 @@ export default function Home() {
               <div className={styles.row2}>
                 <div>
                   <div className={styles.label}>Duration (min)</div>
-                  <input className={styles.input} type="number" value={form.duration} onChange={e => setForm(f => ({...f, duration: e.target.value}))} />
+                  <input className={styles.input} type="number" value={form.duration} onChange={e => setField('duration', e.target.value)} />
                 </div>
                 <div>
                   <div className={styles.label}>Crowd age range</div>
-                  <input className={styles.input} value={form.crowdAge} onChange={e => setForm(f => ({...f, crowdAge: e.target.value}))} />
+                  <input className={styles.input} value={form.crowdAge} onChange={e => setField('crowdAge', e.target.value)} />
                 </div>
               </div>
 
@@ -136,7 +139,7 @@ export default function Home() {
             </div>
           )}
 
-          {/* STEP 2 */}
+          {/* STEP 2 — Music */}
           {step === 2 && (
             <div>
               <h1 className={styles.title}>Define your sound</h1>
@@ -156,29 +159,29 @@ export default function Home() {
               <div className={styles.row2}>
                 <div>
                   <div className={styles.label}>Opening BPM</div>
-                  <input className={styles.input} type="number" value={form.bpmStart} onChange={e => setForm(f => ({...f, bpmStart: e.target.value}))} />
+                  <input className={styles.input} type="number" value={form.bpmStart} onChange={e => setField('bpmStart', e.target.value)} />
                 </div>
                 <div>
                   <div className={styles.label}>Peak BPM</div>
-                  <input className={styles.input} type="number" value={form.bpmPeak} onChange={e => setForm(f => ({...f, bpmPeak: e.target.value}))} />
+                  <input className={styles.input} type="number" value={form.bpmPeak} onChange={e => setField('bpmPeak', e.target.value)} />
                 </div>
               </div>
 
               <div className={styles.section}>
                 <div className={styles.label}>Must-play artists or tracks</div>
-                <input className={styles.input} value={form.mustPlay} onChange={e => setForm(f => ({...f, mustPlay: e.target.value}))} placeholder="e.g. Drake, Burna Boy, Beyoncé…" />
+                <input className={styles.input} value={form.mustPlay} onChange={e => setField('mustPlay', e.target.value)} placeholder="e.g. Drake, Burna Boy, Beyoncé…" />
               </div>
 
               <div className={styles.section}>
                 <div className={styles.label}>Avoid</div>
-                <input className={styles.input} value={form.avoid} onChange={e => setForm(f => ({...f, avoid: e.target.value}))} placeholder="e.g. no country, no slow jams…" />
+                <input className={styles.input} value={form.avoid} onChange={e => setField('avoid', e.target.value)} placeholder="e.g. no country, no slow jams…" />
               </div>
 
               <div className={styles.toggleWrap}>
                 <span className={styles.toggleLabel}>DJ experience level</span>
                 <div className={styles.toggleOpts}>
-                  <button className={`${styles.toggleOpt} ${form.level === 'novice' ? styles.toggleOn : ''}`} onClick={() => setForm(f => ({...f, level: 'novice'}))}>Novice</button>
-                  <button className={`${styles.toggleOpt} ${form.level === 'pro' ? styles.toggleOn : ''}`} onClick={() => setForm(f => ({...f, level: 'pro'}))}>Pro</button>
+                  <button className={`${styles.toggleOpt} ${form.level === 'novice' ? styles.toggleOn : ''}`} onClick={() => setField('level', 'novice')}>Novice</button>
+                  <button className={`${styles.toggleOpt} ${form.level === 'pro' ? styles.toggleOn : ''}`} onClick={() => setField('level', 'pro')}>Pro</button>
                 </div>
               </div>
 
@@ -205,48 +208,53 @@ export default function Home() {
                 <span className={styles.metaTag}>{form.event}</span>
                 <span className={styles.metaTag}>{form.duration} min</span>
                 <span className={styles.metaTag}>{form.bpmStart}–{form.bpmPeak} BPM</span>
-                {form.genres.slice(0,3).map(g => <span key={g} className={styles.metaTag}>{g}</span>)}
+                {form.genres.slice(0, 3).map(g => <span key={g} className={styles.metaTag}>{g}</span>)}
               </div>
 
               <div className={styles.actions}>
-                <button className={styles.actCopy} onClick={copyPlan}>{copied ? 'Copied!' : 'Copy plan'}</button>
+                <button className={styles.actCopy} onClick={copyPlan}>{copied ? '✓ Copied!' : 'Copy plan'}</button>
                 <button className={styles.actNew} onClick={reset}>New set</button>
               </div>
 
+              {/* Overview */}
               <div className={styles.card}>
                 <div className={styles.cardLabel}>Set overview</div>
                 <p className={styles.overview}>{result.overview}</p>
               </div>
 
+              {/* Phases */}
               <div className={styles.card}>
                 <div className={styles.cardLabel}>Phases</div>
                 {result.phases?.map((p, i) => (
-                  <div key={i} className={styles.phaseRow}>
-                    <div className={styles.phaseMeta}>
-                      <div className={styles.phaseName}>{p.name}</div>
-                      <div>{p.time}</div>
-                      <div>{p.bpm} BPM</div>
-                      <div>{p.genre}</div>
+                  <div key={i} className={styles.phase}>
+                    <div className={styles.phaseHeader}>
+                      <div className={styles.phaseLeft}>
+                        <span className={styles.phaseName}>{p.name}</span>
+                        <span className={styles.phaseMeta}>{p.time} · {p.bpm} BPM · {p.genre}</span>
+                      </div>
                       <div className={styles.energyBar}>{energyDots(p.energy)}</div>
                     </div>
-                    <div className={styles.phaseTracks}>
+                    <div className={styles.trackList}>
                       {p.tracks?.map((t, j) => (
-                        <div key={j} className={styles.trackLine}>
-                          <span className={styles.trackNum}>{j+1}</span>
-                          <span>{t}</span>
+                        <div key={j} className={styles.trackRow}>
+                          <span className={styles.trackNum}>{j + 1}</span>
+                          <span className={styles.trackArtist}>{t.artist}</span>
+                          <span className={styles.trackTitle}>{t.title}</span>
+                          <span className={styles.trackBpm}>{t.bpm}</span>
                         </div>
                       ))}
-                      {p.notes && <div className={styles.phaseNote}>{p.notes}</div>}
                     </div>
+                    {p.notes && <div className={styles.phaseNote}>{p.notes}</div>}
                   </div>
                 ))}
               </div>
 
+              {/* Transitions */}
               <div className={styles.card}>
                 <div className={styles.cardLabel}>Key transitions</div>
                 {result.transitions?.map((t, i) => (
                   <div key={i} className={styles.transRow}>
-                    <div className={styles.transArrow}>▶</div>
+                    <span className={styles.transArrow}>▶</span>
                     <div>
                       <div className={styles.transMoment}>{t.moment}</div>
                       <div className={styles.transTech}>{t.technique}</div>
@@ -255,27 +263,31 @@ export default function Home() {
                 ))}
               </div>
 
+              {/* Emergency */}
               <div className={styles.card}>
                 <div className={styles.cardLabel}>Emergency tracks</div>
                 {result.emergency?.map((t, i) => (
-                  <div key={i} className={styles.emergRow}>
-                    <span className={styles.transArrow}>▶</span>
-                    <span>{t}</span>
+                  <div key={i} className={styles.trackRow} style={{ padding: '8px 0' }}>
+                    <span className={styles.trackNum}>{i + 1}</span>
+                    <span className={styles.trackArtist}>{t.artist}</span>
+                    <span className={styles.trackTitle}>{t.title}</span>
+                    <span className={styles.trackBpm}>{t.bpm}</span>
                   </div>
                 ))}
               </div>
 
+              {/* Upsell */}
               <div className={styles.upsell}>
                 <div className={styles.upsellTitle}>SetForge Pro</div>
-                <p className={styles.upsellText}>Unlimited sets · save history · PDF export · Spotify playlist sync</p>
-                <button className={styles.btn} style={{marginTop: '0.5rem'}}>Upgrade — $12/mo</button>
+                <p className={styles.upsellText}>Save sets · live BPM filter mid-gig · PDF export · Spotify sync</p>
+                <button className={styles.btn} style={{ marginTop: '0.75rem' }}>Upgrade — $12/mo</button>
               </div>
             </div>
           )}
 
           {step === 4 && result?.error && (
             <div>
-              <p style={{color:'#888', fontSize:'14px', marginBottom:'1rem'}}>Something went wrong. Please try again.</p>
+              <p style={{ color: '#64748b', fontSize: '15px', marginBottom: '1rem' }}>Something went wrong. Please try again.</p>
               <button className={styles.btn} onClick={reset}>Start over</button>
             </div>
           )}

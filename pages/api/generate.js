@@ -26,21 +26,29 @@ Return this exact JSON structure:
       "bpm": "95–108",
       "energy": 4,
       "genre": "R&B / Hip-Hop",
-      "tracks": ["Artist – Track title", "Artist – Track title", "Artist – Track title", "Artist – Track title"]${isPro ? '' : ',\n      "notes": "1 sentence tip for this phase"'}
+      "tracks": [
+        { "artist": "Artist Name", "title": "Track Title", "bpm": 98 },
+        { "artist": "Artist Name", "title": "Track Title", "bpm": 102 }
+      ]${isPro ? '' : ',\n      "notes": "1 sentence tip for this phase"'}
     }
   ],
   "transitions": [
-    {"moment": "Brief description of the transition moment", "technique": "Specific technique to use"}
+    { "moment": "Brief description of the transition moment", "technique": "Specific technique to use" }
   ],
-  "emergency": ["Artist – Track", "Artist – Track", "Artist – Track"]
+  "emergency": [
+    { "artist": "Artist Name", "title": "Track Title", "bpm": 100 }
+  ]
 }
 
 Rules:
 - 4 to 5 phases covering the full duration
-- ${isPro ? 'No song descriptions — tracks only as "Artist – Track title"' : 'Include brief helpful notes per phase for a beginner DJ'}
+- 4 to 5 tracks per phase
+- Each track must include a realistic BPM as an integer
+- ${isPro ? 'No song descriptions — clean and scannable' : 'Include brief helpful notes per phase for a beginner DJ'}
 - 3 transitions between key phase shifts
-- 3 emergency tracks
+- 3 emergency tracks with BPM
 - Real artist and track names only
+- BPM values must be realistic for the genre and phase
 - Return ONLY the JSON, nothing else`;
 
   try {
