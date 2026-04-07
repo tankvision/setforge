@@ -391,8 +391,7 @@
 @media (max-width: 600px) {
   .container { padding: 1.5rem 1rem; }
   .row2 { grid-template-columns: 1fr; }
-  .trackRow { grid-template-columns: 20px 1fr 48px; }
-  .trackArtist { display: none; }
+  .trackRow { grid-template-columns: 20px auto 1fr 48px; }
   .trackTitle { font-size: 15px; }
   .trackBpm { font-size: 14px; }
   .phaseName { font-size: 16px; }
